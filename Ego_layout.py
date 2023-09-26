@@ -2,11 +2,9 @@ import pandas as pd
 from dash import Dash, html
 from dash import dcc, no_update
 from dash.dependencies import Input, Output, State
-import dash_cytoscape as cyto  # pip install dash-cytoscape
+import dash_cytoscape as cyto
 import numpy as np
 import dash_bootstrap_components as dbc
-
-# import dash_bootstrap_components as dbc
 
 import visdcc  # pip install visdcc
 
@@ -20,6 +18,38 @@ origin_key_dict_pd = pd.read_csv('NER_analysis_data/NER_old/entityDict.csv')
 # 關鍵字類別
 keyword_class_list = ["com", "rocket", "org", "satellite", "term", "loc"]
 filter_class_list = ["com", "rocket", "org", "satellite", "term", "loc"]
+COULOUR = ["#66828E", "#FEC37D", "#D4C3AA", "#678F74", "#CA774B", "#CC5F5A"]
+
+# set my legend
+propotion = 100/len(COULOUR)
+legend = []
+for c, label in zip(COULOUR, keyword_class_list):
+    l = html.Div(label,
+                 style={
+                     'background-color': c,
+                     'padding': '20px',
+                     'color': 'white',
+                     'display': 'inline-block',
+                     'width': str(propotion)+'%',
+                     'font-size': '20px'
+                 })
+    legend.append(l)
+
+bold_orange = {
+    'font-size': '16px',
+    'color': '#CA774B',
+    'font-weight': 'bold',
+    'display': 'block',
+    'margin': '1rem 0rem 0rem 0rem'}  # top,right,bottom,left
+
+inline_orange = {
+    'font-size': '16px',
+    'color': '#CA774B',
+    'font-weight': 'bold',
+    'display': 'inline-block',
+    'margin': '0.5rem 1.5rem 0rem 0rem'}
+
+annotation = {'font-size': '14px', 'color': '#66828E'}
 
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 app.layout = html.Div(children=[
@@ -45,10 +75,7 @@ app.layout = html.Div(children=[
     html.Div([
         html.Div([
             dbc.Label("選擇關鍵字類別",
-                      style={
-                          'font-size': '16px',
-                          'color': '#CA774B',
-                          'font-weight': 'bold'}),
+                      style=bold_orange),
             # 切換類別下拉式選單
             dcc.Dropdown(
                 id='dropdown_choose_class',
@@ -61,10 +88,7 @@ app.layout = html.Div(children=[
                 style={'margin': '0.5rem 0rem 0.8rem 0rem'}
             ),
             dbc.Label("選擇關鍵字",
-                      style={
-                          'font-size': '16px',
-                          'color': '#CA774B',
-                          'font-weight': 'bold'}),
+                      style=bold_orange),
             # 選擇中心詞下拉式選單
             dcc.Dropdown(
                 id='dropdown_choose_name',
@@ -77,14 +101,10 @@ app.layout = html.Div(children=[
                 style={'margin': '0.5rem 0rem 0.8rem 0rem'}
             ),
             dbc.Label("網路篩選遮罩",
-                      style={
-                          'font-size': '16px',
-                          'color': '#CA774B',
-                          'font-weight': 'bold'}),
+                      style=bold_orange),
             # 網路篩選遮罩下拉式選單
             dcc.Dropdown(
                 id='dropdown_choose_filter',
-                # value= "不篩選",
                 clearable=False,
                 multi=True,
                 options=[
@@ -94,18 +114,10 @@ app.layout = html.Div(children=[
                 style={'margin': '0.5rem 0rem 0rem 0rem'}
             ),
             html.H6('針對網路圖的節點類別進行篩選',
-                    style={
-                        'color': '#66828E',
-                        'font-size': '14px',
-                        'margin': '0rem 0rem 0.8rem 0rem'}),
+                    style=annotation),
 
             dbc.Label("設定網路節點數量",
-                      style={
-                          'font-size': '16px',
-                          'color': '#CA774B',
-                          'font-weight': 'bold',
-                          'display': 'inline-block',
-                          'margin': '0.5rem 1.5rem 0rem 0rem'}),  # top,right,bottom,left
+                      style=inline_orange),
             dcc.Dropdown(
                 id='total_nodes_num',
                 options=[{'label': str(i), 'value': i}
@@ -118,12 +130,7 @@ app.layout = html.Div(children=[
                 }
             ),
             dbc.Label("依關聯節度篩選鏈結",
-                      style={
-                          'font-size': '16px',
-                          'margin': '1rem 0rem 0rem 0rem',
-                          'color': '#CA774B',
-                          'font-weight': 'bold',
-                          'display': 'block'}),
+                      style=bold_orange),
             # 網路圖篩選節點閥值slider
             dcc.Slider(
                 id="threshold_slide", min=0, max=1, step=0.01,
@@ -134,12 +141,7 @@ app.layout = html.Div(children=[
                 marks={i/10: str(i/10) for i in range(51)},
                 value=0.5
             ),
-            dbc.Label("字詞連結段落", style={
-                      'font-size': '16px',
-                      'color': '#CA774B',
-                      'font-weight': 'bold',
-                      'margin': '1rem 1.5rem 0rem 0rem',
-                      'display': 'inline-block'}),
+            dbc.Label("字詞連結段落", style=inline_orange),
             # 計算單位選鈕
             dcc.RadioItems(
                 id='RadioItems_SenorDoc',
@@ -151,12 +153,7 @@ app.layout = html.Div(children=[
                        'display': 'inline-block'}
             ),
             dbc.Label("連結強度計算方式",
-                      style={
-                          'font-size': '16px',
-                          'color': '#CA774B',
-                          'font-weight': 'bold',
-                          'margin': '0.5rem 0rem 0rem 0rem',
-                          'display': 'block'}),
+                      style=bold_orange),
             dcc.RadioItems(
                 id='RadioItems_CRorCO',
                 options=[{'label': '共同出現次數', 'value': 'co-occurrence'},
@@ -165,14 +162,11 @@ app.layout = html.Div(children=[
                 inline=True,
                 style={'margin': '0.5rem 0rem 0rem 0rem'}
             ),
-            dbc.Label("連結強度依據字詞出現頻率", style={
-                      'font-size': '14px', 'color': '#66828E', 'margin': '0rem 0rem 0.1rem 0rem', }),
+            dbc.Label("連結強度依據字詞出現頻率", style=annotation),
             html.Br(),
-            dbc.Label("較高，可選「相關係數」", style={
-                      'font-size': '14px', 'color': '#66828E', 'margin': '0rem 0rem 0.1rem 0rem', }),
+            dbc.Label("較高，可選「相關係數」", style=annotation),
             html.Br(),
-            dbc.Label("較低，可擇「共同出現次數」", style={
-                      'font-size': '14px', 'color': '#66828E', 'margin': '0rem 0rem 0.1rem 0rem', }),
+            dbc.Label("較低，可擇「共同出現次數」", style=annotation),
         ],
             style={
             'background-color': '#daf5ed',
@@ -183,28 +177,30 @@ app.layout = html.Div(children=[
         ),
         html.Div([
             # legend
-            html.Div([
-                html.Div("term", style={
-                 'background-color': "#CA774B", 'padding': '20px', 'color': 'white', 'display': 'inline-block', 'width': '16.6%'}),
-                html.Div("loc", style={
-                    'background-color': "#CC5F5A", 'padding': '20px', 'color': 'white', 'display': 'inline-block', 'width': '16.6%'}),
-                html.Div("com", style={
-                    'background-color': "#66828E", 'padding': '20px', 'color': 'white', 'display': 'inline-block', 'width': '16.6%'}),
-                html.Div("rocket", style={
-                    'background-color': "#FEC37D", 'padding': '20px', 'color': 'white', 'display': 'inline-block', 'width': '16.7%'}),
-                html.Div("satellite", style={
-                    'background-color': "#678F74", 'padding': '20px', 'color': 'white', 'display': 'inline-block', 'width': '16.6%'}),
-                html.Div("org", style={
-                    'background-color': "#D4C3AA", 'padding': '20px', 'color': 'white', 'display': 'inline-block', 'width': '16.6%'}),
-            ], style={
-                'background-color': "#ede7d1",  'color': '#f2efe4', 'height': '7.5%', 'text-align': 'center', 'font-size': '24px', 'padding': '0px'}),
+            html.Div(legend,
+                     style={
+                         'background-color': "#ede7d1",
+                         'color': '#f2efe4',
+                         'height': '7.5%',
+                         'text-align': 'center',
+                         'font-size': '24px',
+                         'padding': '0px'}),
             # 放置網路圖
             html.Div("graph", style={
                 'background-color': "white",  'color': 'black'}),
-        ], style={'display': 'inline-block', 'width': '50%', 'height': '1000px', 'verticalAlign': 'top'}),
+        ], style={'display': 'inline-block',
+                  'width': '50%',
+                  'height': '1000px',
+                  'verticalAlign': 'top'}
+        ),
         # 放置文章
         html.Div("article", style={
-            'background-color': "#66828E",  'color': 'white', 'display': 'inline-block', 'width': '35%', 'height': '1000px', 'verticalAlign': 'top'}),
+            'background-color': "#66828E",
+            'color': 'white',
+            'display': 'inline-block',
+            'width': '35%',
+            'height': '1000px',
+            'verticalAlign': 'top'}),
     ], style={'height': '100%', 'width': '100%'}),
 
 ])
