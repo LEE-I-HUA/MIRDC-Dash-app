@@ -16,14 +16,13 @@ external_stylesheets = ['https://unpkg.com/antd@3.1.1/dist/antd.css',
 origin_key_dict_pd = pd.read_csv('NER_analysis_data/NER_old/entityDict.csv')
 
 # 關鍵字類別
-keyword_class_list = ["com", "rocket", "org", "satellite", "term", "loc"]
-filter_class_list = ["com", "rocket", "org", "satellite", "term", "loc"]
+CLASS_LIST = ["com", "rocket", "org", "satellite", "term", "loc"]
 COULOUR = ["#66828E", "#FEC37D", "#D4C3AA", "#678F74", "#CA774B", "#CC5F5A"]
 
 # set my legend
 propotion = 100/len(COULOUR)
 legend = []
-for c, label in zip(COULOUR, keyword_class_list):
+for c, label in zip(COULOUR, CLASS_LIST):
     l = html.Div(label,
                  style={
                      'background-color': c,
@@ -83,7 +82,7 @@ app.layout = html.Div(children=[
                 clearable=False,
                 options=[
                     {'label': clas, 'value': i}
-                    for i, clas in enumerate(keyword_class_list)
+                    for i, clas in enumerate(CLASS_LIST)
                 ],
                 style={'margin': '0.5rem 0rem 0.8rem 0rem'}
             ),
@@ -96,7 +95,7 @@ app.layout = html.Div(children=[
                 clearable=False,
                 options=[
                     {'label': name, 'value': name}
-                    for name in origin_key_dict_pd[origin_key_dict_pd['label'] == keyword_class_list[0]]['keywords'].to_list()
+                    for name in origin_key_dict_pd[origin_key_dict_pd['label'] == CLASS_LIST[0]]['keywords'].to_list()
                 ],
                 style={'margin': '0.5rem 0rem 0.8rem 0rem'}
             ),
@@ -109,7 +108,7 @@ app.layout = html.Div(children=[
                 multi=True,
                 options=[
                     {'label': method, 'value': method}
-                    for i, method in enumerate(filter_class_list)
+                    for i, method in enumerate(CLASS_LIST)
                 ],
                 style={'margin': '0.5rem 0rem 0rem 0rem'}
             ),
