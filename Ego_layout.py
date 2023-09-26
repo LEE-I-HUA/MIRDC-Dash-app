@@ -17,12 +17,12 @@ origin_key_dict_pd = pd.read_csv('NER_analysis_data/NER_old/entityDict.csv')
 
 # 關鍵字類別
 CLASS_LIST = ["com", "rocket", "org", "satellite", "term", "loc"]
-COULOUR = ["#66828E", "#FEC37D", "#D4C3AA", "#678F74", "#CA774B", "#CC5F5A"]
+COLOUR = ["#66828E", "#FEC37D", "#D4C3AA", "#678F74", "#CA774B", "#CC5F5A"]
 
 # set my legend
-propotion = 100/len(COULOUR)
+propotion = 100/len(COLOUR)
 legend = []
-for c, label in zip(COULOUR, CLASS_LIST):
+for c, label in zip(COLOUR, CLASS_LIST):
     l = html.Div(label,
                  style={
                      'background-color': c,
